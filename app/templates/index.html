@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Newsreader', serif;
+            background: linear-gradient(to bottom, #1e1e1e, #2c2c2c);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 10vh;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 2vh;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2vh;
+            width: 80vw;
+            max-width: 600px;
+        }
+
+        label {
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            margin-bottom: 1vh;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 1.2vh;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+        }
+
+        button {
+            font-size: 1.2rem;
+            padding: 1vh 2vw;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #333;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: white;
+        }
+
+        img {
+            margin-top: 4vh;
+            max-width: 80vw;
+            border-radius: 10px;
+            display: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            animation: fadeIn 1s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(1vh);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+    <script>
+        async function generateImage(event) {
+            event.preventDefault();
+
+            const text = document.getElementById("text").value;
+
+            const response = await fetch('/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: text })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                if (result.image_url) {
+                    document.getElementById("generated-image").src = result.image_url;
+                    document.getElementById("generated-image").style.display = 'block';
+                }
+            } else {
+                console.error("Error generating image:", response.statusText);
+            }
+        }
+
+    </script>
+</head>
+<body>
+    <h1>Generate Your Image</h1>
+    <form onsubmit="generateImage(event)">
+        <label for="text">Enter your prompt:</label>
+        <input type="text" id="text" name="text" required>
+        <button type="submit">Generate</button>
+    </form>
+    <img id="generated-image" alt="Generated Image">
+</body>
+</html>

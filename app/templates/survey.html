@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Mood Survey</title>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.22.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.4.0"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Newsreader', serif;
+            background: linear-gradient(to bottom, #1e1e1e, #2c2c2c);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-top: 5vh;
+            padding-left: 5vw;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 2vh;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5vh;
+            width: 60vw;
+            max-width: 600px;
+        }
+
+        label {
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            margin-bottom: 1vh;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 1vh;
+        }
+
+        .answer {
+            font-size: 1rem;
+        }
+
+        button {
+            font-size: 1.2rem;
+            padding: 1vh 2vw;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #333;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: white;
+        }
+
+        .error {
+            color: red;
+            margin-top: 2vh;
+        }
+
+        .image-prompt-section {
+            margin-top: 2vh;
+        }
+
+        #generated-image {
+            margin-top: 20px;
+            max-width: 100%;
+            border-radius: 8px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Character Mood Survey</h1>
+        <form onsubmit="submitSurvey(event)">
+            <label>What type of music do you prefer?</label>
+            <div class="answers">
+                <label class="answer"><input type="radio" name="mood" value="uplifting">Energetic and dynamic</label>
+                <label class="answer"><input type="radio" name="mood" value="dreamy">Calm and relaxing</label>
+                <label class="answer"><input type="radio" name="mood" value="melancholic">Sad and melancholic</label>
+            </div>
+
+            <label>Imagine you're standing on top of a mountain. What do you feel?</label>
+            <div class="answers">
+                <label class="answer"><input type="radio" name="sound_type" value="melodic lead">Freedom</label>
+                <label class="answer"><input type="radio" name="sound_type" value="synth pads">Inspiration</label>
+                <label class="answer"><input type="radio" name="sound_type" value="synth heavy">Ready for battle</label>
+            </div>
+
+            <label>In which genre would you like to exist?</label>
+            <div class="answers">
+                <label class="answer"><input type="radio" name="rhythm" value="has steady beat">Superhero world</label>
+                <label class="answer"><input type="radio" name="rhythm" value="no beat">Space fantasy</label>
+                <label class="answer"><input type="radio" name="rhythm" value="rhythmic pulse">Medieval fantasy</label>
+            </div>
+
+            <div class="image-prompt-section">
+                <label>What is your role in the fantasy world?</label>
+                <div class="answers">
+                    <label class="answer">
+                        <input type="radio" name="role" value="Adventurer, a brave and curious soul seeking quests and challenges.">Adventurer
+                    </label>
+                    <label class="answer">
+                        <input type="radio" name="role" value="Mage and keeper of ancient secrets, wise and mysterious.">Mage
+                    </label>
+                    <label class="answer">
+                        <input type="radio" name="role" value="Warrior and protector, dedicated to defending others and fighting for justice.">Warrior
+                    </label>
+                    <label class="answer">
+                        <input type="radio" name="role" value="Trickster and rogue, cunning and mischievous, always playing tricks.">Trickster
+                    </label>
+                </div>
+
+                <label>Which element do you feel most connected to?</label>
+                <div class="answers">
+                    <label class="answer">
+                        <input type="radio" name="element" value="Fire, fierce and passionate, representing energy and destruction.">Fire
+                    </label>
+                    <label class="answer">
+                        <input type="radio" name="element" value="Water, calm and adaptable, symbolizing fluidity and depth.">Water
+                    </label>
+                    <label class="answer">
+                        <input type="radio" name="element" value="Air, free and open, representing intellect and freedom.">Air
+                    </label>
+                    <label class="answer">
+                        <input type="radio" name="element" value="Earth, grounded and stable, representing strength and endurance.">Earth
+                    </label>
+                </div>
+
+                <label>How would you describe your personality?</label>
+                <div class="answers">
+                    <label class="answer">
+                        <input type="radio" name="personality" value="Energetic and passionate, driven by excitement and adventure.">Energetic and passionate
+                    </label>
+                    <label class="answer">
+                        <input type="radio" name="personality" value="Calm and thoughtful, always considering the consequences and staying grounded.">Calm and thoughtful
+                    </label>
+                    <label class="answer">
+                        <input type="radio" name="personality" value="Kind and caring, always thinking about the well-being of others.">Kind and caring
+                    </label>
+                    <label class="answer">
+                        <input type="radio" name="personality" value="Decisive and goal-oriented, always focused on achieving objectives.">Decisive and goal-oriented
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit">Generate Music and Image</button>
+        </form>
+
+        <p id="error-message" class="error"></p>
+
+        <midi-player id="midi-player" style="width: 100%; max-width: 600px; margin-top: 20px; display: none;" sound-font></midi-player>
+
+        <div id="player-controls" style="margin-top: 20px; display: none;">
+            <a id="midi-link" href="" download>Download MIDI</a>
+        </div>
+
+        <!-- Image Display -->
+        <div id="image-container" style="margin-top: 30px; display: none;">
+            <img id="generated-image" src="" alt="Generated Character Image" />
+        </div>
+    </div>
+
+    <script>
+        async function submitSurvey(event) {
+            event.preventDefault();
+
+            // Collect form data
+            const form = new FormData(event.target);
+            const formData = Object.fromEntries(form.entries());
+            console.log(formData);
+
+            const text = `mood: ${formData.mood} | sound_type: ${formData.sound_type} | rhythm: ${formData.rhythm}`;
+
+            const role = formData.role || 'Adventurer';
+            const element = formData.element || 'Fire';
+            const personality = formData.personality || 'Energetic and passionate';
+            
+            const imagePrompt = `A painting in the style of Rococo of a character who is a ${role}, connected to the element of ${element}, with a personality that is ${personality}.`;
+
+            const errorMessage = document.getElementById("error-message");
+            const midiLink = document.getElementById("midi-link");
+            const playerControls = document.getElementById("player-controls");
+            const midiPlayer = document.getElementById("midi-player");
+            const imageContainer = document.getElementById("image-container");
+            const generatedImage = document.getElementById("generated-image");
+
+            errorMessage.innerText = "";
+            playerControls.style.display = 'none';
+            midiPlayer.style.display = 'none';
+            imageContainer.style.display = 'none';
+
+            try {
+                // Call music generation API
+                const musicResponse = await fetch('/generate-music', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+
+                const musicResult = await musicResponse.json();
+
+                if (musicResponse.ok && musicResult.midi_url) {
+                    const midiUrl = window.location.origin + musicResult.midi_url;
+
+                    midiPlayer.src = midiUrl;
+                    midiPlayer.style.display = 'block';
+                    midiLink.href = midiUrl;
+                    midiLink.style.display = 'inline-block';
+                    playerControls.style.display = 'block';
+                } else {
+                    errorMessage.innerText = 'Music generation failed. Please try again later.';
+                }
+
+                // Call image generation API
+                const imageResponse = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: imagePrompt })
+                });
+
+                const imageResult = await imageResponse.json();
+
+                if (imageResponse.ok && imageResult.image_url) {
+                    generatedImage.src = imageResult.image_url;
+                    generatedImage.style.display = 'block';
+                    imageContainer.style.display = 'block';
+                } else {
+                    errorMessage.innerText = 'Image generation failed. Please try again later.';
+                }
+            } catch (error) {
+                errorMessage.innerText = 'An error occurred. Please try again later.';
+            }
+        }
+    </script>
+</body>
+</html>

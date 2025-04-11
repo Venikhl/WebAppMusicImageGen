@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Music</title>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.22.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.4.0"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Newsreader', serif;
+            background: linear-gradient(to bottom, #1e1e1e, #2c2c2c);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 10vh;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 2vh;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2vh;
+            width: 80vw;
+            max-width: 600px;
+        }
+
+        label {
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            margin-bottom: 1vh;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 1.2vh;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+        }
+
+        button {
+            font-size: 1.2rem;
+            padding: 1vh 2vw;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #333;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: white;
+        }
+
+        a {
+            color: white;
+            font-size: 1.2rem;
+            text-decoration: none;
+            margin-top: 2vh;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: #ffb74d;
+        }
+
+        .error {
+            color: red;
+            margin-top: 2vh;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generate Music</h1>
+    <form onsubmit="generateMusic(event)">
+        <label for="text">Enter Music Prompt:</label>
+        <input type="text" id="text" name="text" required>
+        <button type="submit">Generate Music</button>
+    </form>
+
+    <midi-player id="midi-player" style="width: 100%; max-width: 600px; margin-top: 20px; display: none;" sound-font></midi-player>
+
+    <div id="player-controls" style="margin-top: 20px; display: none;">
+        <a id="midi-link" href="" download>Download MIDI</a>
+    </div>
+
+    <p id="error-message" class="error"></p>
+
+    <script>
+        async function generateMusic(event) {
+            event.preventDefault();
+
+            const text = document.getElementById("text").value;
+            const errorMessage = document.getElementById("error-message");
+            const midiLink = document.getElementById("midi-link");
+            const playerControls = document.getElementById("player-controls");
+            const midiPlayer = document.getElementById("midi-player");
+
+            errorMessage.innerText = "";
+            playerControls.style.display = 'none';
+            midiPlayer.style.display = 'none';
+
+            try {
+                const response = await fetch('/generate-music', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.midi_url) {
+                    const midiUrl = window.location.origin + result.midi_url;
+
+                    midiLink.href = midiUrl;
+                    midiPlayer.src = midiUrl;
+
+                    playerControls.style.display = 'block';
+                    midiPlayer.style.display = 'block';
+                } else {
+                    throw new Error(result.error || "Music generation failed");
+                }
+            } catch (err) {
+                console.error("Error generating music:", err);
+                errorMessage.innerText = "Failed to generate music. Please try again.";
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to the Image Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Newsreader', serif;
+            height: 100vh;
+            color: white;
+        }
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("/static/background.png") no-repeat center center fixed;
+            background-size: cover;
+            filter: brightness(40%);
+            z-index: 0;
+        }
+
+        .content {
+            z-index: 1;
+            position: relative;
+            padding: 20vh 10vh;
+            max-width: 120vh;
+        }
+
+        h1 {
+            font-size: 7vh;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 4vh;
+            margin-bottom: 40px;
+        }
+
+        button {
+            font-size: 3vh;
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        button:hover {
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="content">
+        <p style="font-size: 3vh;">Create your own character in a magical world!</p>
+        <h1>The Neuro Universe</h1>
+        <p>Answer the questions and the artificial intelligence will create your unique hero with a melody that reflects his soul.</p>
+        <a href="/generate-page"><button>Image ✨</button></a>
+        <a href="/generate-music-page"><button>Music 🎵</button></a>
+        <a href="/survey"><button>Survey 📝</button></a>
+    </div>
+</body>
+</html>
